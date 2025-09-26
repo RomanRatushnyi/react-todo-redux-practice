@@ -13,14 +13,19 @@ import {
 import {
   sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable'
-import { Plus } from 'lucide-react'
+import { Plus, LogOut, User } from 'lucide-react'
 import { useAppDispatch, useAppSelector } from './store/hooks'
 import { addTodo, deleteTodo, updateTodo, updateTodoStatus, moveTodo } from './store/todoSlice'
+import { logout } from './store/authSlice'
 import type { Todo, TodoStatus } from './store/todoSlice'
 import TodoItem from './components/TodoItem'
 import TodoForm from './components/TodoForm'
 import TodoColumn from './components/TodoColumn'
+import LoginPage from './components/LoginPage'
+import NotFoundPage from './components/NotFoundPage'
 import './App.css'
+
+type AppPage = 'todos' | 'notfound'
 
 const COLUMNS = [
   { id: 'todo', title: '📝 Потрібно виконати', color: '#3b82f6' },
@@ -30,7 +35,10 @@ const COLUMNS = [
 
 function App() {
   const dispatch = useAppDispatch()
+  const { isAuthenticated, user } = useAppSelector((state) => state.auth)
   const todos = useAppSelector((state) => state.todos.todos)
+
+  const [currentPage, setCurrentPage] = useState<AppPage>('todos')
   const [showForm, setShowForm] = useState(false)
   const [editingTodo, setEditingTodo] = useState<Todo | null>(null)
   const [activeId, setActiveId] = useState<string | null>(null)
@@ -41,6 +49,10 @@ function App() {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   )
+
+  if (!isAuthenticated) {
+    return <LoginPage />
+  }
 
   const handleDragStart = (event: DragStartEvent) => {
     setActiveId(event.active.id as string)
@@ -55,7 +67,6 @@ function App() {
     const activeId = active.id as string
     const overId = over.id as string
 
-    // Если перетаскиваем в колонку
     if (COLUMNS.some(col => col.id === overId)) {
       dispatch(updateTodoStatus({ id: activeId, status: overId as TodoStatus }))
       return
@@ -66,11 +77,9 @@ function App() {
 
     if (!activeTask || !overTask) return
 
-    // Если перетаскиваем между разными статусами или внутри одного статуса
     if (activeTask.status !== overTask.status) {
       dispatch(updateTodoStatus({ id: activeId, status: overTask.status }))
     } else {
-      // Перемещение внутри одной колонки
       dispatch(moveTodo({ activeId, overId, overStatus: overTask.status }))
     }
   }
@@ -93,24 +102,50 @@ function App() {
     dispatch(deleteTodo(id))
   }
 
+  const handleLogout = () => {
+    dispatch(logout())
+  }
+
   const getTodosByStatus = (status: TodoStatus) =>
     todos.filter(todo => todo.status === status)
 
   const activeTodo = activeId ? todos.find(todo => todo.id === activeId) : null
 
+  if (currentPage === 'notfound') {
+    return <NotFoundPage onGoHome={() => setCurrentPage('todos')} />
+  }
+
   return (
     <div className="app">
       <div className="container">
         <header className="header">
-          <h1 className="title">✨ Мої задачі</h1>
-          <button
-            className="add-button"
-            onClick={() => setShowForm(true)}
-            title="Додати нову задачу"
-          >
-            <Plus size={20} />
-            Додати задачу
-          </button>
+          <div className="header-left">
+            <h1 className="title">✨ Мої задачі</h1>
+            <div className="user-info">
+              <User size={16} />
+              <span>Вітаємо, {user?.username}!</span>
+            </div>
+          </div>
+
+          <div className="header-actions">
+            <button
+              className="add-button"
+              onClick={() => setShowForm(true)}
+              title="Додати нову задачу"
+            >
+              <Plus size={20} />
+              Додати задачу
+            </button>
+
+            <button
+              className="logout-button"
+              onClick={handleLogout}
+              title="Вийти з системи"
+            >
+              <LogOut size={20} />
+              Вийти
+            </button>
+          </div>
         </header>
 
         {showForm && (

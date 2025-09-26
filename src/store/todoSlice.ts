@@ -53,7 +53,7 @@ const todoSlice = createSlice({
         id: Date.now().toString(),
         text: action.payload.text,
         status: 'todo',
-        createdAt: new Date().toISOString() // Сохраняем как строку
+        createdAt: new Date().toISOString()
       }
       state.todos.push(newTodo)
       saveTodosToStorage(state.todos)

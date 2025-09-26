@@ -28,12 +28,22 @@ body {
   flex-direction: column;
 }
 
-/* Заголовок */
 .header {
-  text-align: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 20px;
   padding-bottom: 20px;
   border-bottom: 2px solid rgba(99, 102, 241, 0.1);
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.header-left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
 }
 
 .title {
@@ -43,8 +53,51 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  margin-bottom: 15px;
+  margin: 0;
   letter-spacing: -0.5px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #718096;
+  background: rgba(102, 126, 234, 0.1);
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.logout-button {
+  background: linear-gradient(135deg, #f56565, #e53e3e);
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.logout-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 15px rgba(245, 101, 101, 0.3);
+}
+
+.logout-button:active {
+  transform: translateY(0);
 }
 
 .stats {
@@ -73,7 +126,6 @@ body {
   font-weight: 500;
 }
 
-/* Кнопка добавления */
 .add-button-container {
   display: flex;
   justify-content: center;
@@ -105,7 +157,6 @@ body {
   transform: translateY(0);
 }
 
-/* Доска с колонками */
 .board {
   flex: 1;
   display: flex;
@@ -121,7 +172,6 @@ body {
   min-height: 500px;
 }
 
-/* Колонка */
 .todo-column {
   background: white;
   border-radius: 16px;
@@ -197,7 +247,6 @@ body {
   color: var(--column-color);
 }
 
-/* Элемент задачи */
 .todo-item {
   display: flex;
   align-items: center;
@@ -402,7 +451,6 @@ body {
   transform: translateY(-1px);
 }
 
-/* Подсказки */
 .todo-action-button[title]:hover::after,
 .todo-status-button[title]:hover::after {
   content: attr(title);
@@ -432,7 +480,6 @@ body {
   z-index: 1000;
 }
 
-/* Форма добавления/редактирования */
 .todo-form-overlay {
   position: fixed;
   top: 0;
@@ -546,7 +593,6 @@ body {
   margin-top: 10px;
 }
 
-/* Пустое состояние */
 .empty-state {
   text-align: center;
   padding: 60px 20px;
@@ -576,7 +622,6 @@ body {
   opacity: 0.8;
 }
 
-/* Адаптивность */
 @media (max-width: 1024px) {
   .columns {
     grid-template-columns: 1fr;
@@ -628,7 +673,6 @@ body {
   }
 }
 
-/* Анимации */
 @keyframes bounceIn {
   0% {
     transform: scale(0.3);
@@ -652,7 +696,6 @@ body {
   animation: bounceIn 0.6s ease;
 }
 
-/* Скроллбар */
 .column-content::-webkit-scrollbar {
   width: 6px;
 }
