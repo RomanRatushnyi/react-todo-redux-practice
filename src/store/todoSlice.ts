@@ -4,6 +4,7 @@ export interface Todo {
   id: string
   text: string
   status: 'todo' | 'inProgress' | 'completed'
+  completed?: string
   createdAt: string
 }
 
@@ -21,7 +22,7 @@ const loadTodosFromStorage = (): Todo[] => {
   try {
     const savedTodos = localStorage.getItem('todos')
     if (savedTodos) {
-      return JSON.parse(savedTodos).map((todo: any) => ({
+      return JSON.parse(savedTodos).map((todo: Todo) => ({
         ...todo,
         status: todo.status || (todo.completed ? 'completed' : 'todo'),
         createdAt: todo.createdAt || new Date().toISOString()
