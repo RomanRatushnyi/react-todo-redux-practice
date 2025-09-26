@@ -1,41 +1,39 @@
 import { useDroppable } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import TodoItem from './TodoItem'
-import type { Todo, TodoStatus } from '../App'
+import type { Todo, TodoStatus } from '../store/todoSlice'
 
-interface Column {
+interface TodoColumnProps {
   id: string
   title: string
   color: string
-}
-
-interface TodoColumnProps {
-  column: Column
   todos: Todo[]
-  onEditTodo: (todo: Todo) => void
-  onDeleteTodo: (id: string) => void
+  onEdit: (todo: Todo) => void
+  onDelete: (id: string) => void
   onStatusChange: (id: string, status: TodoStatus) => void
 }
 
 const TodoColumn: React.FC<TodoColumnProps> = ({
-  column,
+  id,
+  title,
+  color,
   todos,
-  onEditTodo,
-  onDeleteTodo,
+  onEdit,
+  onDelete,
   onStatusChange
 }) => {
   const { setNodeRef, isOver } = useDroppable({
-    id: column.id,
+    id: id,
   })
 
   return (
     <div
       ref={setNodeRef}
       className={`todo-column ${isOver ? 'drag-over' : ''}`}
-      style={{ '--column-color': column.color } as React.CSSProperties}
+      style={{ '--column-color': color } as React.CSSProperties}
     >
       <div className="column-header">
-        <h3 className="column-title">{column.title}</h3>
+        <h3 className="column-title">{title}</h3>
         <span className="column-count">{todos.length}</span>
       </div>
 
@@ -45,16 +43,8 @@ const TodoColumn: React.FC<TodoColumnProps> = ({
             <TodoItem
               key={todo.id}
               todo={todo}
-              onToggle={() => {
-                const nextStatus = todo.status === 'completed'
-                  ? 'todo'
-                  : todo.status === 'todo'
-                    ? 'inProgress'
-                    : 'completed'
-                onStatusChange(todo.id, nextStatus)
-              }}
-              onDelete={() => onDeleteTodo(todo.id)}
-              onEdit={() => onEditTodo(todo)}
+              onEdit={onEdit}
+              onDelete={onDelete}
               onStatusChange={onStatusChange}
             />
           ))}

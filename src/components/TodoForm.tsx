@@ -4,19 +4,17 @@ import { Check, X } from 'lucide-react'
 interface TodoFormProps {
   onSubmit: (text: string) => void
   onCancel: () => void
-  placeholder: string
-  initialValue?: string
+  initialText?: string
   isEditing?: boolean
 }
 
 const TodoForm: React.FC<TodoFormProps> = ({
   onSubmit,
   onCancel,
-  placeholder,
-  initialValue = '',
+  initialText = '',
   isEditing = false
 }) => {
-  const [text, setText] = useState(initialValue)
+  const [text, setText] = useState(initialText)
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -50,7 +48,7 @@ const TodoForm: React.FC<TodoFormProps> = ({
             value={text}
             onChange={(e) => setText(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={placeholder}
+            placeholder={isEditing ? 'Редагувати задачу...' : 'Нова задача...'}
             className="todo-input"
             maxLength={200}
           />

@@ -1,23 +1,22 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { Check, X, Edit2, GripVertical, Play } from 'lucide-react'
-import type { Todo, TodoStatus } from '../App'
+import type { Todo, TodoStatus } from '../store/todoSlice'
 
 interface TodoItemProps {
   todo: Todo
-  onToggle: () => void
-  onDelete: () => void
-  onEdit: () => void
+  onEdit: (todo: Todo) => void
+  onDelete: (id: string) => void
   onStatusChange: (id: string, status: TodoStatus) => void
-  isDragOverlay?: boolean
+  isDragging?: boolean
 }
 
 const TodoItem: React.FC<TodoItemProps> = ({
   todo,
-  onToggle,
-  onDelete,
   onEdit,
-  isDragOverlay = false
+  onDelete,
+  onStatusChange,
+  isDragging = false
 }) => {
   const {
     attributes,
@@ -25,13 +24,13 @@ const TodoItem: React.FC<TodoItemProps> = ({
     setNodeRef,
     transform,
     transition,
-    isDragging,
+    isDragging: sortableIsDragging,
   } = useSortable({ id: todo.id })
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.5 : 1,
+    opacity: sortableIsDragging ? 0.5 : 1,
   }
 
   const getStatusIcon = () => {
@@ -42,6 +41,17 @@ const TodoItem: React.FC<TodoItemProps> = ({
         return <Play size={12} className="status-icon in-progress-icon" />
       case 'completed':
         return <Check size={12} className="status-icon completed-icon" />
+    }
+  }
+
+  const getNextStatus = (): TodoStatus => {
+    switch (todo.status) {
+      case 'todo':
+        return 'inProgress'
+      case 'inProgress':
+        return 'completed'
+      case 'completed':
+        return 'todo'
     }
   }
 
@@ -56,7 +66,11 @@ const TodoItem: React.FC<TodoItemProps> = ({
     }
   }
 
-  if (isDragOverlay) {
+  const handleStatusToggle = () => {
+    onStatusChange(todo.id, getNextStatus())
+  }
+
+  if (isDragging) {
     return (
       <div className="todo-item drag-overlay-item">
         <div className="todo-content">
@@ -80,7 +94,7 @@ const TodoItem: React.FC<TodoItemProps> = ({
     <div
       ref={setNodeRef}
       style={style}
-      className={`todo-item status-${todo.status} ${isDragging ? 'dragging' : ''}`}
+      className={`todo-item status-${todo.status} ${sortableIsDragging ? 'dragging' : ''}`}
     >
       <div className="todo-content">
         <div
@@ -93,7 +107,7 @@ const TodoItem: React.FC<TodoItemProps> = ({
 
         <button
           className={`todo-status-button status-${todo.status}`}
-          onClick={onToggle}
+          onClick={handleStatusToggle}
           title={getToggleTooltip()}
         >
           {getStatusIcon()}
@@ -103,34 +117,24 @@ const TodoItem: React.FC<TodoItemProps> = ({
           <span className={`todo-text ${todo.status === 'completed' ? 'completed-text' : ''}`}>
             {todo.text}
           </span>
-          <span className="todo-date">
-            {todo.createdAt.toLocaleDateString('ru-RU', {
-              day: 'numeric',
-              month: 'short',
-              hour: '2-digit',
-              minute: '2-digit'
-            })}
-          </span>
         </div>
-      </div>
 
-      <div className="todo-actions">
-        <button
-          className="todo-action-button edit-button"
-          onClick={onEdit}
-          disabled={todo.status === 'completed'}
-          title="Редагувати задачу"
-        >
-          <Edit2 size={16} />
-        </button>
-
-        <button
-          className="todo-action-button delete-button"
-          onClick={onDelete}
-          title="Видалити задачу"
-        >
-          <X size={16} />
-        </button>
+        <div className="todo-actions">
+          <button
+            className="action-button edit-button"
+            onClick={() => onEdit(todo)}
+            title="Редагувати задачу"
+          >
+            <Edit2 size={14} />
+          </button>
+          <button
+            className="action-button delete-button"
+            onClick={() => onDelete(todo.id)}
+            title="Видалити задачу"
+          >
+            <X size={14} />
+          </button>
+        </div>
       </div>
     </div>
   )
