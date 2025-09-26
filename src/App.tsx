@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import { useAppSelector } from './store/hooks'
-import LoginPage from './components/LoginPage'
-import NotFoundPage from './components/NotFoundPage'
+import LoginPage from './pages/LoginPage'
+import NotFoundPage from './pages/NotFoundPage'
 import TodosPage from './pages/TodosPage'
 import './App.css'
 
