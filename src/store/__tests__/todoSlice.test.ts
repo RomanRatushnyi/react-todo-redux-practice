@@ -1,7 +1,8 @@
 import { configureStore } from '@reduxjs/toolkit'
 import todoReducer, { createTodo, updateTodo, deleteTodo } from '../todoSlice'
 
-const mockFetch = fetch as jest.MockedFunction<typeof fetch>
+const mockFetch = jest.fn() as jest.MockedFunction<typeof fetch>
+global.fetch = mockFetch
 
 const createTestStore = () => configureStore({
   reducer: {

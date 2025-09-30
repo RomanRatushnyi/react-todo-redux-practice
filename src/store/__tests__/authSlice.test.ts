@@ -1,7 +1,14 @@
 import { configureStore } from '@reduxjs/toolkit'
 import authReducer, { loginSuccess, logout, clearError } from '../authSlice'
 
-// Типизированный store для тестов
+const localStorageMock = {
+  getItem: jest.fn(),
+  setItem: jest.fn(),
+  removeItem: jest.fn(),
+  clear: jest.fn(),
+}
+global.localStorage = localStorageMock as any
+
 const createTestStore = () => configureStore({
   reducer: {
     auth: authReducer,
@@ -14,23 +21,36 @@ describe('authSlice', () => {
   let store: TestStore
 
   beforeEach(() => {
+    jest.clearAllMocks()
+    localStorageMock.getItem.mockReturnValue(null)
     store = createTestStore()
   })
 
-  test('should handle login success', () => {
-    const loginData = { username: 'testuser', password: 'password' }
+  test('should handle login success with correct credentials', () => {
+    const loginData = { username: 'admin', password: 'admin123' }
 
     store.dispatch(loginSuccess(loginData))
 
     const state = store.getState().auth
     expect(state.isAuthenticated).toBe(true)
-    expect(state.user).toEqual({ username: 'testuser', password: 'password' })
+    expect(state.user).toEqual({ id: '1', username: 'admin' })
     expect(state.error).toBe(null)
   })
 
+  test('should handle login failure with incorrect credentials', () => {
+    const loginData = { username: 'wrong', password: 'wrong' }
+
+    store.dispatch(loginSuccess(loginData))
+
+    const state = store.getState().auth
+    expect(state.isAuthenticated).toBe(false)
+    expect(state.user).toBe(null)
+    expect(state.error).toBe('Неправильний логін або пароль')
+  })
+
   test('should handle logout', () => {
-    // First login
-    store.dispatch(loginSuccess({ username: 'testuser', password: 'password' }))
+    // First login with correct credentials
+    store.dispatch(loginSuccess({ username: 'admin', password: 'admin123' }))
 
     // Then logout
     store.dispatch(logout())
