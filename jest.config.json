@@ -1,0 +1,30 @@
+{
+  "preset": "ts-jest",
+  "testEnvironment": "jsdom",
+  "setupFilesAfterEnv": ["<rootDir>/src/setupTests.ts"],
+  "moduleNameMapping": {
+    "^@/(.*)$": "<rootDir>/src/$1"
+  },
+  "testMatch": [
+    "<rootDir>/src/**/__tests__/**/*.{ts,tsx}",
+    "<rootDir>/src/**/*.{test,spec}.{ts,tsx}",
+    "<rootDir>/shared/**/__tests__/**/*.{ts,tsx}"
+  ],
+  "collectCoverageFrom": [
+    "src/**/*.{ts,tsx}",
+    "shared/**/*.{ts,tsx}",
+    "!src/**/*.d.ts",
+    "!src/main.tsx"
+  ],
+  "transform": {
+    "^.+\\.(ts|tsx)$": ["ts-jest", {
+      "tsconfig": {
+        "jsx": "react-jsx"
+      }
+    }]
+  },
+  "moduleFileExtensions": ["ts", "tsx", "js", "jsx"],
+  "transformIgnorePatterns": [
+    "node_modules/(?!(@reduxjs/toolkit|lucide-react)/)"
+  ]
+}

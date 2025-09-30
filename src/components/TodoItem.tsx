@@ -1,7 +1,7 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { Check, X, Edit2, GripVertical, Play } from 'lucide-react'
-import type { Todo, TodoStatus } from '../store/todoSlice'
+import type { Todo, TodoStatus } from '../../shared/types'
 
 interface TodoItemProps {
   todo: Todo

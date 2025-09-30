@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { LogIn, Eye, EyeOff, Lock, User } from 'lucide-react'
+import { LogIn, Eye, EyeOff, Lock, User, Shield } from 'lucide-react'
 import { useAppDispatch, useAppSelector } from '../store/hooks'
 import { loginSuccess, clearError } from '../store/authSlice'
 import './LoginPage.css'
@@ -36,99 +36,98 @@ const LoginPage: React.FC = () => {
 
   return (
     <div className="login-container">
-      <div className="login-card">
-        <div className="login-header">
-          <div className="login-icon">
-            <LogIn size={32} />
-          </div>
-          <h1 className="login-title">Вхід до системи</h1>
-          <p className="login-subtitle">Введіть свої дані для доступу до додатку</p>
-        </div>
-
-        <form className="login-form" onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label className="form-label" htmlFor="username">
-              Логін
-            </label>
-            <div className="input-container">
-              <User className="input-icon" size={20} />
-              <input
-                id="username"
-                type="text"
-                value={username}
-                onChange={(e) => {
-                  setUsername(e.target.value)
-                  handleInputChange()
-                }}
-                className="form-input"
-                placeholder="Введіть логін"
-                disabled={isLoading}
-                autoComplete="username"
-              />
+      <div className="login-background">
+        <div className="login-card">
+          <div className="login-header">
+            <div className="company-logo">
+              <Shield size={40} />
+            </div>
+            <h1 className="login-title">TodoTask Management</h1>
+            <p className="login-subtitle">Secure Business Environment</p>
+            <div className="environment-badge">
+              <span className="env-indicator"></span>
+              Test Environment
             </div>
           </div>
 
-          <div className="form-group">
-            <label className="form-label" htmlFor="password">
-              Пароль
-            </label>
-            <div className="input-container">
-              <Lock className="input-icon" size={20} />
-              <input
-                id="password"
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value)
-                  handleInputChange()
-                }}
-                className="form-input"
-                placeholder="Введіть пароль"
-                disabled={isLoading}
-                autoComplete="current-password"
-              />
-              <button
-                type="button"
-                className="password-toggle"
-                onClick={() => setShowPassword(!showPassword)}
-                disabled={isLoading}
-                title={showPassword ? 'Приховати пароль' : 'Показати пароль'}
-              >
-                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-              </button>
+          <form className="login-form" onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label className="form-label" htmlFor="username">
+                Username
+              </label>
+              <div className="input-wrapper">
+                <User className="input-icon" size={20} />
+                <input
+                  id="username"
+                  type="text"
+                  value={username}
+                  onChange={(e) => {
+                    setUsername(e.target.value)
+                    handleInputChange()
+                  }}
+                  placeholder="Enter your username"
+                  className="form-input"
+                  required
+                />
+              </div>
             </div>
-          </div>
 
-          {error && (
-            <div className="error-message">
-              {error}
+            <div className="form-group">
+              <label className="form-label" htmlFor="password">
+                Password
+              </label>
+              <div className="input-wrapper">
+                <Lock className="input-icon" size={20} />
+                <input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value)
+                    handleInputChange()
+                  }}
+                  placeholder="Enter your password"
+                  className="form-input"
+                  required
+                />
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
             </div>
-          )}
 
-          <button
-            type="submit"
-            className={`login-button ${isLoading ? 'loading' : ''}`}
-            disabled={!username.trim() || !password.trim() || isLoading}
-          >
-            {isLoading ? (
-              <>
-                <div className="spinner"></div>
-                Вхід...
-              </>
-            ) : (
-              <>
-                <LogIn size={20} />
-                Увійти
-              </>
+            {error && (
+              <div className="error-message">
+                {error}
+              </div>
             )}
-          </button>
-        </form>
 
-        <div className="demo-credentials">
-          <div className="demo-title">Демо-дані для входу:</div>
-          <div className="demo-data">
-            <div>Логін: <strong>admin</strong></div>
-            <div>Пароль: <strong>admin123</strong></div>
+            <button
+              type="submit"
+              className={`login-button ${isLoading ? 'loading' : ''}`}
+              disabled={isLoading || !username.trim() || !password.trim()}
+            >
+              {isLoading ? (
+                <div className="loading-spinner" />
+              ) : (
+                <>
+                  <LogIn size={20} />
+                  Sign In
+                </>
+              )}
+            </button>
+          </form>
+
+          <div className="login-footer">
+            <div className="security-info">
+              <Shield size={16} />
+              Secure connection established
+            </div>
+            <p className="version-info">v2.1.0 | Build 2025.09.30</p>
           </div>
         </div>
       </div>
