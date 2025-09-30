@@ -14,19 +14,15 @@ npm run docker:up
 ```bash
 # Start both frontend and backend
 npm run dev
-
-# Or separately:
-npm run dev:frontend  # http://localhost:5173
-npm run dev:backend   # http://localhost:3000
 ```
+
+The application will be available on:
+http://localhost:5173/
 
 ### 4. Run Tests
 ```bash
 # Run all tests
 npm test
-
-# Run tests in watch mode
-npm run test:watch
 
 # Run with code coverage
 npm run test:coverage
@@ -80,19 +76,21 @@ MySQL runs in Docker container:
 │   ├── components/    # Components
 │   ├── pages/         # Pages
 │   └── store/         # Redux store
-└── docker-compose.yml # MySQL container
+└── docker-compose.yml # Postgres container
 ```
 
 ## Login
 
-Use any credentials to access the system (visual mock).
+To access the system (visual mock), use the following credentials:
+
+- **Username:** `admin`
+- **Password:** `admin123`
 
 ## Commands
 
 - `npm run dev` - Start dev servers
 - `npm run build` - Build production version
-- `npm run docker:up` - Start MySQL
-- `npm run docker:down` - Stop MySQL
+- `npm run docker:up` - Start DB
+- `npm run docker:down` - Stop DB
 - `npm test` - Run tests
-- `npm run test:watch` - Tests in watch mode
 - `npm run test:coverage` - Tests with code coverage
