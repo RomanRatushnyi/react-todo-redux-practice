@@ -1,17 +1,16 @@
 import { useState } from 'react'
 import { LogIn, Eye, EyeOff, Lock, User, Shield } from 'lucide-react'
 import { useAppDispatch, useAppSelector } from '../store/hooks'
-import { loginSuccess, clearError } from '../store/authSlice'
+import { loginUser, clearError } from '../store/authSlice'
 import './LoginPage.css'
 
 const LoginPage: React.FC = () => {
   const dispatch = useAppDispatch()
-  const { error } = useAppSelector((state) => state.auth)
+  const { error, loading } = useAppSelector((state) => state.auth)
 
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -20,12 +19,7 @@ const LoginPage: React.FC = () => {
       return
     }
 
-    setIsLoading(true)
-
-    setTimeout(() => {
-      dispatch(loginSuccess({ username: username.trim(), password }))
-      setIsLoading(false)
-    }, 1000)
+    dispatch(loginUser({ username: username.trim(), password }))
   }
 
   const handleInputChange = () => {
@@ -52,48 +46,49 @@ const LoginPage: React.FC = () => {
 
           <form className="login-form" onSubmit={handleSubmit}>
             <div className="form-group">
-              <label className="form-label" htmlFor="username">
+              <label htmlFor="username" className="form-label">
+                <User size={16} />
                 Username
               </label>
-              <div className="input-wrapper">
-                <User className="input-icon" size={20} />
-                <input
-                  id="username"
-                  type="text"
-                  value={username}
-                  onChange={(e) => {
-                    setUsername(e.target.value)
-                    handleInputChange()
-                  }}
-                  placeholder="Enter your username"
-                  className="form-input"
-                  required
-                />
-              </div>
+              <input
+                id="username"
+                type="text"
+                className="form-input"
+                value={username}
+                onChange={(e) => {
+                  setUsername(e.target.value)
+                  handleInputChange()
+                }}
+                placeholder="Enter your username"
+                required
+                disabled={loading}
+              />
             </div>
 
             <div className="form-group">
-              <label className="form-label" htmlFor="password">
+              <label htmlFor="password" className="form-label">
+                <Lock size={16} />
                 Password
               </label>
-              <div className="input-wrapper">
-                <Lock className="input-icon" size={20} />
+              <div className="password-input-wrapper">
                 <input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
+                  className="form-input"
                   value={password}
                   onChange={(e) => {
                     setPassword(e.target.value)
                     handleInputChange()
                   }}
                   placeholder="Enter your password"
-                  className="form-input"
                   required
+                  disabled={loading}
                 />
                 <button
                   type="button"
                   className="password-toggle"
                   onClick={() => setShowPassword(!showPassword)}
+                  disabled={loading}
                 >
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
@@ -108,14 +103,17 @@ const LoginPage: React.FC = () => {
 
             <button
               type="submit"
-              className={`login-button ${isLoading ? 'loading' : ''}`}
-              disabled={isLoading || !username.trim() || !password.trim()}
+              className={`login-button ${loading ? 'loading' : ''}`}
+              disabled={loading || !username.trim() || !password.trim()}
             >
-              {isLoading ? (
-                <div className="loading-spinner" />
+              {loading ? (
+                <>
+                  <div className="spinner"></div>
+                  Authenticating...
+                </>
               ) : (
                 <>
-                  <LogIn size={20} />
+                  <LogIn size={18} />
                   Sign In
                 </>
               )}
@@ -123,11 +121,15 @@ const LoginPage: React.FC = () => {
           </form>
 
           <div className="login-footer">
-            <div className="security-info">
-              <Shield size={16} />
-              Secure connection established
+            <div className="credentials-info">
+              <p className="demo-credentials">
+                <strong>Demo Credentials:</strong>
+              </p>
+              <p className="credentials-text">
+                Username: <code>admin</code><br />
+                Password: <code>admin123</code>
+              </p>
             </div>
-            <p className="version-info">v2.1.0 | Build 2025.09.30</p>
           </div>
         </div>
       </div>

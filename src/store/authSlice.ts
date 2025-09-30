@@ -1,4 +1,5 @@
-import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { authAPI, type LoginRequest } from '../services/authService'
 
 interface User {
   id: string
@@ -9,17 +10,14 @@ interface AuthState {
   isAuthenticated: boolean
   user: User | null
   error: string | null
+  loading: boolean
 }
 
 const initialState: AuthState = {
   isAuthenticated: false,
   user: null,
-  error: null
-}
-
-const DEMO_CREDENTIALS = {
-  username: 'admin',
-  password: 'admin123'
+  error: null,
+  loading: false
 }
 
 const loadAuthFromStorage = (): { isAuthenticated: boolean; user: User | null } => {
@@ -46,6 +44,18 @@ const saveAuthToStorage = (isAuthenticated: boolean, user: User | null) => {
   }
 }
 
+export const loginUser = createAsyncThunk(
+  'auth/loginUser',
+  async (credentials: LoginRequest, { rejectWithValue }) => {
+    try {
+      const response = await authAPI.login(credentials)
+      return response
+    } catch (error) {
+      return rejectWithValue(error instanceof Error ? error.message : 'Ошибка входа')
+    }
+  }
+)
+
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
@@ -53,29 +63,11 @@ const authSlice = createSlice({
     ...loadAuthFromStorage()
   },
   reducers: {
-    loginSuccess: (state, action: PayloadAction<{ username: string; password: string }>) => {
-      const { username, password } = action.payload
-
-      if (username === DEMO_CREDENTIALS.username && password === DEMO_CREDENTIALS.password) {
-        const user: User = {
-          id: '1',
-          username: username
-        }
-
-        state.isAuthenticated = true
-        state.user = user
-        state.error = null
-
-        saveAuthToStorage(true, user)
-      } else {
-        state.error = 'Неправильний логін або пароль'
-      }
-    },
-
     logout: (state) => {
       state.isAuthenticated = false
       state.user = null
       state.error = null
+      state.loading = false
 
       saveAuthToStorage(false, null)
       localStorage.removeItem('todos')
@@ -84,8 +76,35 @@ const authSlice = createSlice({
     clearError: (state) => {
       state.error = null
     }
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(loginUser.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(loginUser.fulfilled, (state, action) => {
+        const { user } = action.payload
+        const mappedUser: User = {
+          id: user.id.toString(),
+          username: user.username
+        }
+
+        state.isAuthenticated = true
+        state.user = mappedUser
+        state.error = null
+        state.loading = false
+
+        saveAuthToStorage(true, mappedUser)
+      })
+      .addCase(loginUser.rejected, (state, action) => {
+        state.isAuthenticated = false
+        state.user = null
+        state.error = action.payload as string
+        state.loading = false
+      })
   }
 })
 
-export const { loginSuccess, logout, clearError } = authSlice.actions
+export const { logout, clearError } = authSlice.actions
 export default authSlice.reducer
