@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   DndContext,
   closestCenter,
@@ -15,9 +15,9 @@ import {
 } from '@dnd-kit/sortable'
 import { Plus, LogOut, User } from 'lucide-react'
 import { useAppDispatch, useAppSelector } from '../store/hooks'
-import { addTodo, deleteTodo, updateTodo, updateTodoStatus, moveTodo } from '../store/todoSlice'
+import { fetchTodos, deleteTodo, updateTodo } from '../store/todoSlice'
 import { logout } from '../store/authSlice'
-import type { Todo, TodoStatus } from '../store/todoSlice'
+import type { Todo, TodoStatus } from '../../shared/types'
 import TodoItem from '../components/TodoItem'
 import TodoForm from '../components/TodoForm'
 import TodoColumn from '../components/TodoColumn'
@@ -30,8 +30,8 @@ const COLUMNS = [
 
 const TodosPage = () => {
   const dispatch = useAppDispatch()
-  const todos = useAppSelector((state) => state.todos.todos)
-  const user = useAppSelector((state) => state.auth.user)
+  const { todos } = useAppSelector((state) => state.todos)
+  const { user } = useAppSelector((state) => state.auth)
 
   const [showForm, setShowForm] = useState(false)
   const [editingTodo, setEditingTodo] = useState<Todo | null>(null)
@@ -43,6 +43,10 @@ const TodosPage = () => {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   )
+
+  useEffect(() => {
+    dispatch(fetchTodos())
+  }, [dispatch])
 
   const handleDragStart = (event: DragStartEvent) => {
     setActiveId(event.active.id as string)
@@ -58,7 +62,7 @@ const TodosPage = () => {
     const overId = over.id as string
 
     if (COLUMNS.some(col => col.id === overId)) {
-      dispatch(updateTodoStatus({ id: activeId, status: overId as TodoStatus }))
+      dispatch(updateTodo({ id: activeId, status: overId as TodoStatus }))
       return
     }
 
@@ -68,24 +72,12 @@ const TodosPage = () => {
     if (!activeTask || !overTask) return
 
     if (activeTask.status !== overTask.status) {
-      dispatch(updateTodoStatus({ id: activeId, status: overTask.status }))
-    } else {
-      dispatch(moveTodo({ activeId, overId, overStatus: overTask.status }))
+      dispatch(updateTodo({ id: activeId, status: overTask.status }))
     }
   }
 
-  const handleAddTodo = (text: string) => {
-    dispatch(addTodo({ text }))
-    setShowForm(false)
-  }
-
-  const handleUpdateTodo = (id: string, text: string) => {
-    dispatch(updateTodo({ id, text }))
-    setEditingTodo(null)
-  }
-
   const handleUpdateTodoStatus = (id: string, status: TodoStatus) => {
-    dispatch(updateTodoStatus({ id, status }))
+    dispatch(updateTodo({ id, status }))
   }
 
   const handleDeleteTodo = (id: string) => {
@@ -109,7 +101,7 @@ const TodosPage = () => {
             <h1 className="title">✨ Мої задачі</h1>
             <div className="user-info">
               <User size={16} />
-              <span>Вітаємо, {user?.username}!</span>
+              <span>Вітаємо, {user?.username || 'User'}!</span>
             </div>
           </div>
 
@@ -136,7 +128,6 @@ const TodosPage = () => {
 
         {showForm && (
           <TodoForm
-            onSubmit={handleAddTodo}
             onCancel={() => setShowForm(false)}
           />
         )}
@@ -144,7 +135,7 @@ const TodosPage = () => {
         {editingTodo && (
           <TodoForm
             initialText={editingTodo.text}
-            onSubmit={(text) => handleUpdateTodo(editingTodo.id, text)}
+            todoId={editingTodo.id}
             onCancel={() => setEditingTodo(null)}
             isEditing
           />

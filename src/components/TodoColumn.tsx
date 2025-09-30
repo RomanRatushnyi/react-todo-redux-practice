@@ -1,7 +1,7 @@
 import { useDroppable } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import TodoItem from './TodoItem'
-import type { Todo, TodoStatus } from '../store/todoSlice'
+import type { Todo, TodoStatus } from '../../shared/types'
 
 interface TodoColumnProps {
   id: string

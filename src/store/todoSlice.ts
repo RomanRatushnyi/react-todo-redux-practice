@@ -1,115 +1,97 @@
-import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
-
-export interface Todo {
-  id: string
-  text: string
-  status: 'todo' | 'inProgress' | 'completed'
-  completed?: string
-  createdAt: string
-}
-
-export type TodoStatus = 'todo' | 'inProgress' | 'completed'
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import type { Todo, CreateTodoDto, UpdateTodoDto, TodoResponse } from '../../shared/types'
 
 interface TodoState {
   todos: Todo[]
+  loading: boolean
+  error: string | null
 }
 
 const initialState: TodoState = {
-  todos: []
+  todos: [],
+  loading: false,
+  error: null
 }
 
-const loadTodosFromStorage = (): Todo[] => {
-  try {
-    const savedTodos = localStorage.getItem('todos')
-    if (savedTodos) {
-      return JSON.parse(savedTodos).map((todo: Todo) => ({
-        ...todo,
-        status: todo.status || (todo.completed ? 'completed' : 'todo'),
-        createdAt: todo.createdAt || new Date().toISOString()
-      }))
-    }
-  } catch (error) {
-    console.error('Error loading todos from localStorage:', error)
+// Async thunks для API
+export const fetchTodos = createAsyncThunk(
+  'todos/fetchTodos',
+  async () => {
+    const response = await fetch('http://localhost:3000/api/todos')
+    const data: TodoResponse = await response.json()
+    return data.data
   }
-  return []
-}
+)
 
-const saveTodosToStorage = (todos: Todo[]) => {
-  try {
-    localStorage.setItem('todos', JSON.stringify(todos))
-  } catch (error) {
-    console.error('Error saving todos to localStorage:', error)
+export const createTodo = createAsyncThunk(
+  'todos/createTodo',
+  async (todoData: CreateTodoDto) => {
+    const response = await fetch('http://localhost:3000/api/todos', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(todoData)
+    })
+    return await response.json()
   }
-}
+)
+
+export const updateTodo = createAsyncThunk(
+  'todos/updateTodo',
+  async ({ id, ...updateData }: { id: string } & UpdateTodoDto) => {
+    const response = await fetch(`http://localhost:3000/api/todos/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updateData)
+    })
+    return await response.json()
+  }
+)
+
+export const deleteTodo = createAsyncThunk(
+  'todos/deleteTodo',
+  async (id: string) => {
+    await fetch(`http://localhost:3000/api/todos/${id}`, {
+      method: 'DELETE'
+    })
+    return id
+  }
+)
 
 const todoSlice = createSlice({
   name: 'todos',
-  initialState: {
-    ...initialState,
-    todos: loadTodosFromStorage()
-  },
-  reducers: {
-    addTodo: (state, action: PayloadAction<{ text: string }>) => {
-      const newTodo: Todo = {
-        id: Date.now().toString(),
-        text: action.payload.text,
-        status: 'todo',
-        createdAt: new Date().toISOString()
-      }
-      state.todos.push(newTodo)
-      saveTodosToStorage(state.todos)
-    },
-
-    deleteTodo: (state, action: PayloadAction<string>) => {
-      state.todos = state.todos.filter(todo => todo.id !== action.payload)
-      saveTodosToStorage(state.todos)
-    },
-
-    updateTodo: (state, action: PayloadAction<{ id: string; text: string }>) => {
-      const todo = state.todos.find(todo => todo.id === action.payload.id)
-      if (todo) {
-        todo.text = action.payload.text
-        saveTodosToStorage(state.todos)
-      }
-    },
-
-    updateTodoStatus: (state, action: PayloadAction<{ id: string; status: TodoStatus }>) => {
-      const todo = state.todos.find(todo => todo.id === action.payload.id)
-      if (todo) {
-        todo.status = action.payload.status
-        saveTodosToStorage(state.todos)
-      }
-    },
-
-    moveTodo: (state, action: PayloadAction<{ activeId: string; overId: string; overStatus: TodoStatus }>) => {
-      const { activeId, overId, overStatus } = action.payload
-      const activeTodo = state.todos.find(todo => todo.id === activeId)
-
-      if (activeTodo) {
-        activeTodo.status = overStatus
-
-        if (overId !== activeId) {
-          const activeIndex = state.todos.findIndex(todo => todo.id === activeId)
-          const overIndex = state.todos.findIndex(todo => todo.id === overId)
-
-          if (activeIndex !== -1 && overIndex !== -1) {
-            const [removed] = state.todos.splice(activeIndex, 1)
-            state.todos.splice(overIndex, 0, removed)
-          }
+  initialState,
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      // Fetch todos
+      .addCase(fetchTodos.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(fetchTodos.fulfilled, (state, action) => {
+        state.loading = false
+        state.todos = action.payload
+      })
+      .addCase(fetchTodos.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.error.message || 'Failed to fetch todos'
+      })
+      // Create todo
+      .addCase(createTodo.fulfilled, (state, action) => {
+        state.todos.unshift(action.payload)
+      })
+      // Update todo
+      .addCase(updateTodo.fulfilled, (state, action) => {
+        const index = state.todos.findIndex(todo => todo.id === action.payload.id)
+        if (index !== -1) {
+          state.todos[index] = action.payload
         }
-
-        saveTodosToStorage(state.todos)
-      }
-    }
+      })
+      // Delete todo
+      .addCase(deleteTodo.fulfilled, (state, action) => {
+        state.todos = state.todos.filter(todo => todo.id !== action.payload)
+      })
   }
 })
-
-export const {
-  addTodo,
-  deleteTodo,
-  updateTodo,
-  updateTodoStatus,
-  moveTodo
-} = todoSlice.actions
 
 export default todoSlice.reducer

@@ -1,21 +1,24 @@
 import { useState, useEffect, useRef } from 'react'
 import { Check, X } from 'lucide-react'
+import { useAppDispatch } from '../store/hooks'
+import { createTodo, updateTodo } from '../store/todoSlice'
 
 interface TodoFormProps {
-  onSubmit: (text: string) => void
   onCancel: () => void
   initialText?: string
   isEditing?: boolean
+  todoId?: string
 }
 
 const TodoForm: React.FC<TodoFormProps> = ({
-  onSubmit,
   onCancel,
   initialText = '',
-  isEditing = false
+  isEditing = false,
+  todoId
 }) => {
   const [text, setText] = useState(initialText)
   const inputRef = useRef<HTMLInputElement>(null)
+  const dispatch = useAppDispatch()
 
   useEffect(() => {
     if (inputRef.current) {
@@ -27,8 +30,13 @@ const TodoForm: React.FC<TodoFormProps> = ({
     e.preventDefault()
     const trimmedText = text.trim()
     if (trimmedText) {
-      onSubmit(trimmedText)
+      if (isEditing && todoId) {
+        dispatch(updateTodo({ id: todoId, text: trimmedText }))
+      } else {
+        dispatch(createTodo({ text: trimmedText }))
+      }
       setText('')
+      onCancel()
     }
   }
 
