@@ -1,19 +1,17 @@
 version: '3.8'
 services:
-  mysql:
-    image: mysql:8.0
-    container_name: todo-mysql
+  postgres:
+    image: postgres:15
+    container_name: todo-postgres
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: todoapp
-      MYSQL_USER: todouser
-      MYSQL_PASSWORD: todopassword
+      POSTGRES_DB: todoapp
+      POSTGRES_USER: todouser
+      POSTGRES_PASSWORD: todopassword
     ports:
-      - "3306:3306"
+      - "5432:5432"
     volumes:
-      - mysql_data:/var/lib/mysql
-    command: --default-authentication-plugin=mysql_native_password
+      - postgres_data:/var/lib/postgresql/data
 
 volumes:
-  mysql_data:
+  postgres_data:
