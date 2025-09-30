@@ -6,9 +6,9 @@ import { Todo } from './todo/todo.model';
 @Module({
   imports: [
     SequelizeModule.forRoot({
-      dialect: 'mysql',
+      dialect: 'postgres',
       host: 'localhost',
-      port: 3306,
+      port: 5432,
       username: 'todouser',
       password: 'todopassword',
       database: 'todoapp',
