@@ -11,6 +11,8 @@ lerna-debug.log*
 coverage
 
 
+backend/tsconfig.tsbuildinfo
+
 node_modules
 dist
 dist-ssr

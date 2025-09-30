@@ -1,5 +1,5 @@
 import { Column, Model, Table, DataType, PrimaryKey, Default } from 'sequelize-typescript';
-import { Todo as TodoInterface, TodoStatus } from '../../../shared/types';
+import { Todo as TodoInterface, TodoStatus } from '../types';
 
 @Table({
   tableName: 'todos',

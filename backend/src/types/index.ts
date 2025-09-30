@@ -1,5 +1,5 @@
 // This file must be backward compatible (identical) with the file types:
-// backend/src/types/index.ts
+// shared/types.ts
 
 export interface Todo {
   id: string
