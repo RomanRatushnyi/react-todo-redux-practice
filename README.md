@@ -2,7 +2,7 @@
 
 ### 1. Install Dependencies
 ```bash
-npm install
+npm install --legacy-peer-deps
 ```
 
 ### 2. Start Database
