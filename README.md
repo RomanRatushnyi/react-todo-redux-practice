@@ -58,7 +58,7 @@ src/
 
 ## Database
 
-MySQL runs in Docker container:
+PosgreSQL runs in Docker container:
 - **Host**: localhost:3306
 - **Database**: todoapp
 - **User**: todouser
