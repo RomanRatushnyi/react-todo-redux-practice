@@ -1,7 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import type { Todo } from '../../../shared/types'
 
-// Простой мок компонента TodoItem для тестирования логики
 const MockTodoItem = ({ todo, onEdit, onDelete }: {
   todo: Todo
   onEdit: (todo: Todo) => void
