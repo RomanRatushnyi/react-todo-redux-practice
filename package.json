@@ -11,12 +11,8 @@
     "build:frontend": "tsc -b && vite build",
     "build:backend": "cd backend && npm run build",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "docker:up": "docker-compose up -d",
-    "docker:down": "docker-compose down",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "docker:up": "docker compose up -d",
+    "test": "jest"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
