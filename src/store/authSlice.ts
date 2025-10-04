@@ -49,6 +49,8 @@ export const loginUser = createAsyncThunk(
   async (credentials: LoginRequest, { rejectWithValue }) => {
     try {
       const response = await authAPI.login(credentials)
+      const token = response.access_token
+      document.cookie = `access_token=${token}; path=/; max-age=${60 * 60}; secure; samesite=strict`
       return response
     } catch (error) {
       return rejectWithValue(error instanceof Error ? error.message : 'Ошибка входа')
