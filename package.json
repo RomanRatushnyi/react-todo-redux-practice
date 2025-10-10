@@ -11,7 +11,7 @@
     "build:frontend": "tsc -b && vite build",
     "build:backend": "cd backend && npm run build",
     "lint": "eslint .",
-    "docker:up": "docker compose up -d",
+    "docker:up": "docker-compose up -d",
     "test": "jest"
   },
   "dependencies": {
