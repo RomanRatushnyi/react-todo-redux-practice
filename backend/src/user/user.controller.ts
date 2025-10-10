@@ -24,7 +24,6 @@ export class UserController {
       throw new HttpException('Неправильний логін або пароль', HttpStatus.UNAUTHORIZED);
     }
 
-    
     const payload = { username: user.username, sub: user.id };
     const accessToken = this.jwtService.sign(payload);
 
